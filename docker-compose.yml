@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  mongodb:
+    image: docker.io/mongo:7.0.4-jammy
+    container_name: backend
+    ports:
+      - "27017:27017"
+    #environment:
+      #MONGO_INITDB_ROOT_USERNAME: root
+      #MONGO_INITDB_ROOT_PASSWORD: example
+
+  node-app:
+    build:
+      context: .
+      dockerfile: Containerfile
+    container_name: chatui
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    #Create a folder called model_cache and copy the models to this folder 
+    volumes:
+      - ./model_cache:/tmp
+    # environment:
+    #   MONGO_URI: mongodb://root:example@mongodb:27017/chatui  # Change 'mydatabase' to your desired database name
+

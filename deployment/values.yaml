@@ -1,0 +1,117 @@
+# Merged values.yaml
+
+replicaCount: 1
+image:
+  repository: ghcr.io/huggingface/text-generation-inference
+  tag: 1.1.0
+resources:
+  limits:
+    cpu: '12'
+    memory: 32Gi
+    nvidia.com/gpu: '1'
+  requests:
+    cpu: '12'
+    memory: 32Gi
+    nvidia.com/gpu: '1'
+envFrom:
+    - configMapRef:
+        name: hf-text-generation-inference-server-configmap
+    - secretRef:
+        name: hf-text-generation-inference-server-secrets
+ports:
+  - name: http
+    containerPort: 3000
+    protocol: TCP
+terminationGracePeriodSeconds: 120
+terminationMessagePath: /dev/termination-log
+terminationMessagePolicy: File
+schedulerName: default-scheduler
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  seccompProfile:
+    type: RuntimeDefault
+imagePullPolicy: IfNotPresent
+imagePullSecrets:
+  - name: my-docker-registry-secret
+volumeMounts:
+  - name: models-cache
+    mountPath: /models-cache
+  - name: shm
+    mountPath: /dev/shm
+
+volumes:
+  - name: models-cache
+    persistentVolumeClaim:
+      claimName: models-cache
+  - name: shm
+    emptyDir:
+      medium: Memory
+      sizeLimit: 1Gi
+
+dnsPolicy: ClusterFirst
+
+service:
+  type: ClusterIP
+  port: 3000
+
+# Probes configuration
+probes:
+  livenessProbe:
+    enabled: true
+    path: /healthz
+    initialDelaySeconds: 5
+    periodSeconds: 10
+
+  readinessProbe:
+    enabled: true
+    path: /healthz
+    initialDelaySeconds: 5
+    periodSeconds: 10
+
+serviceAccount:
+  create: true
+  name: my-service-account
+
+# Additional values from the other file
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+
+route:
+  enabled: false
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+mongodb:
+  auth:
+    enabled: false

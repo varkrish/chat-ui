@@ -4,5 +4,11 @@
 	"editor.codeActionsOnSave": {
 		"source.fixAll": true
 	},
-	"eslint.validate": ["javascript", "svelte"]
+	"eslint.validate": [
+		"javascript",
+		"svelte"
+	],
+	"[dockerfile]": {
+		"editor.defaultFormatter": "ms-azuretools.vscode-docker"
+	}
 }
