@@ -65,13 +65,13 @@ service:
 # Probes configuration
 probes:
   livenessProbe:
-    enabled: true
+    enabled: false
     path: /healthz
     initialDelaySeconds: 5
     periodSeconds: 10
 
   readinessProbe:
-    enabled: true
+    enabled: false
     path: /healthz
     initialDelaySeconds: 5
     periodSeconds: 10
@@ -122,7 +122,7 @@ mongodb:
   podSecurityContext:
     enabled: false
   containerSecurityContext:
-    enabled: true
+    enabled: false
     runAsUser: ""
     runAsNonRoot: true
     privileged: false
