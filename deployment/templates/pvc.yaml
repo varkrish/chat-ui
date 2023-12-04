@@ -1,0 +1,14 @@
+# templates/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.pvc.name | default (printf "%s-pvc" .Release.Name) }}
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
+spec:
+  storageClassName: {{ .Values.pvc.storageClass | default "default" }}
+  accessModes:
+    - ReadWriteOnce  # Adjust the access mode based on your requirements
+  resources:
+    requests:
+      storage: {{ .Values.pvc.storageSize | default "1Gi" }}
+  volumeMode: Filesystem  # Set the volume mode to Filesystem

@@ -5,6 +5,7 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: {{ $fullName }}
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
     {{- include "deployment.labels" . | nindent 4 }}
   {{- with .Values.route.annotations }}

@@ -35,14 +35,19 @@ securityContext:
   seccompProfile:
     type: RuntimeDefault
 imagePullPolicy: IfNotPresent
-imagePullSecrets:
-  - name: my-docker-registry-secret
+imagePullSecrets: {}
+# values.yaml
+pvc:
+  storageSize: 30Gi
+  name: models-cache
+  storageClass: gp3-csi
+
+
 volumeMounts:
   - name: models-cache
     mountPath: /models-cache
   - name: shm
     mountPath: /dev/shm
-
 volumes:
   - name: models-cache
     persistentVolumeClaim:
@@ -52,7 +57,6 @@ volumes:
       medium: Memory
       sizeLimit: 1Gi
 
-dnsPolicy: ClusterFirst
 
 service:
   type: ClusterIP
@@ -74,7 +78,7 @@ probes:
 
 serviceAccount:
   create: true
-  name: my-service-account
+  name: chatui
 
 # Additional values from the other file
 nameOverride: ""
@@ -115,3 +119,16 @@ affinity: {}
 mongodb:
   auth:
     enabled: false
+  podSecurityContext:
+    enabled: false
+  containerSecurityContext:
+    enabled: true
+    runAsUser: ""
+    runAsNonRoot: true
+    privileged: false
+    readOnlyRootFilesystem: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    seccompProfile:
+      type: "RuntimeDefault"
