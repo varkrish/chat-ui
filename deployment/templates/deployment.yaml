@@ -22,7 +22,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       restartPolicy: Always
-      {{- toYaml .Values.schedulerName | indent 6 }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       containers:
         - resources:
@@ -60,4 +59,3 @@ spec:
           {{- end }}
       volumes:
         {{ toYaml .Values.volumes | nindent 6 }}
-      dnsPolicy: {{ .Values.dnsPolicy }}
