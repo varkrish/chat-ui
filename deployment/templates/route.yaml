@@ -12,12 +12,12 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  spec:
+spec:
   port:
     targetPort: http
   to:
     kind: Service
-    name: {{ include "deployment.fullname" . }}
+    name:  {{ include "deployment.fullname" . }}
     weight: 100
   tls:
     insecureEdgeTerminationPolicy: Redirect

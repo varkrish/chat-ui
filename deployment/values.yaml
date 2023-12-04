@@ -90,7 +90,7 @@ podSecurityContext: {}
 
 
 route:
-  enabled: false
+  enabled: true
 
 ingress:
   enabled: false
