@@ -1,0 +1,61 @@
+# templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Values.ui.namespace | default .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.ui.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      {{- with .Values.ui.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: {{ .Values.ui.terminationGracePeriodSeconds }}
+      containers:
+        - resources:
+            {{- toYaml .Values.ui.resources | nindent 12 }}
+          terminationMessagePath: {{ .Values.ui.terminationMessagePath }}
+          name: server
+          envFrom:
+          {{- toYaml .Values.ui.envFrom | nindent 12 }} 
+          securityContext:
+          {{- toYaml .Values.ui.securityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.ui.service.port }}
+              protocol: TCP
+          imagePullPolicy: {{ .Values.ui.imagePullPolicy }}
+          volumeMounts:
+            {{ toYaml .Values.ui.volumeMounts | nindent 12 }}
+          terminationMessagePolicy: {{ .Values.ui.terminationMessagePolicy }}
+          image: '{{ .Values.ui.image.repository }}:{{ .Values.ui.image.tag }}'
+          {{- if .Values.ui.probes.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.ui.probes.livenessProbe.path }}
+              port: {{ .Values.ui.service.port }}
+            initialDelaySeconds: {{ .Values.ui.probes.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.ui.probes.livenessProbe.periodSeconds }}
+          {{- end }}
+          {{- if .Values.ui.probes.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.ui.probes.readinessProbe.path }}
+              port: {{ .Values.ui.service.port }}
+            initialDelaySeconds: {{ .Values.ui.probes.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.ui.probes.readinessProbe.periodSeconds }}
+          {{- end }}
+      volumes:
+        {{ toYaml .Values.ui.volumes | nindent 6 }}
